@@ -1,2 +1,5 @@
 # ignore project file
 p4.code-workspace
+
+# ignore log file
+http_access_log
