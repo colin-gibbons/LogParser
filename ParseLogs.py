@@ -43,8 +43,10 @@ def main():
         curline=0
         for line in logFile:
             curline+=1 
-            splitData = re.split('.*\[(.*):1.*\] \".* (.*) .*\" (\d{3})', line)
+            splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
             print(splitData)
+            date = splitData[1].split('/')
+            print(date)
             if curline>maxlines: 
                 break
             
