@@ -46,7 +46,7 @@ def main():
             splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
             print(splitData)
             date = splitData[1].split('/')
-            print(date)
+            dictMonth = {'Jan': {}, 'Feb': {}, 'Mar': {}, 'Apr': {}, 'May': {}, 'Jun': {}, 'Jul': {}, 'Aug': {}, 'Sep': {}, 'Oct': {}, 'Nov': {}, 'Dec':{}}
             if curline>maxlines: 
                 break
             
