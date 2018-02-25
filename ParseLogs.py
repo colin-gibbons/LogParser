@@ -35,7 +35,7 @@ def main():
         print("No cached " + fileName + " found.\nDownloading from: " + url)
         getDataFile()
     else:
-        print("Using cached " + fileName " file.")
+        print("Using cached " + fileName + " file.")
     
     with open(fileName, 'rb') as logFile:
         print("parse")
