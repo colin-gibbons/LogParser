@@ -47,6 +47,7 @@ def main():
             print(splitData)
             date = splitData[1].split('/')
             dictMonth = {'Jan': {}, 'Feb': {}, 'Mar': {}, 'Apr': {}, 'May': {}, 'Jun': {}, 'Jul': {}, 'Aug': {}, 'Sep': {}, 'Oct': {}, 'Nov': {}, 'Dec':{}}
+            dictMonth[date[1]]
             if curline>maxlines: 
                 break
             
