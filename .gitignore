@@ -3,4 +3,6 @@ p4.code-workspace
 
 # ignore log file
 http_access_log
+http.log
 .vscode/launch.json
+.vscode/tasks.json
