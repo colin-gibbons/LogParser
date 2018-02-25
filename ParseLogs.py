@@ -1,5 +1,6 @@
 from urllib.request import urlopen
 import os
+import re
 
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
 fileName = "http.log"
@@ -36,8 +37,17 @@ def main():
     else:
         print("Using cached " + fileName + " file.")
     
-    with open(fileName, 'rb') as logFile: #opens http.log file
-        print("parse")
+    with open(fileName, 'r') as logFile: #opens http.log file
+        print("starting parser")
+        maxlines=100
+        curline=0
+        for line in logFile:
+            curline+=1 
+            splitData = re.split('.*\[(.*):1.*\] \".* (.*) .*\" (\d{3})', line)
+            print(splitData)
+            if curline>maxlines: 
+                break
+            
         
      
 
