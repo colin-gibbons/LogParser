@@ -41,30 +41,36 @@ def main():
     with open(fileName, 'r') as logFile: #opens http.log file
         print("starting parser")
 
-        dictMonth = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}}
+        year = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}}
         monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
+        getName = {v: k for k, v in monthToInt.items()}
 
-        maxlines=100
+        maxlines=10000000
         curline=0
         for line in logFile:
             curline+=1 
             splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
-            print(splitData)
-            dateSplit = splitData[1].split('/')
-            dateVar = datetime.date(int(dateSplit[2]), monthToInt[dateSplit[1]], int(dateSplit[0]))
 
-            print(dateVar)
-            if dateVar.day in dictMonth[dateVar.month]:
-                dictMonth[dateVar.month][dateVar.day].append({'date': dateVar, 'name':splitData[2], 'code':splitData[3]})
-            else:
-                dictMonth[dateVar.month][dateVar.day] = [{'date': dateVar, 'name':splitData[2], 'code':splitData[3]}]
+            if len(splitData) == 5:
+                dateSplit = splitData[1].split('/')
+                date = datetime.date(int(dateSplit[2]), monthToInt[dateSplit[1]], int(dateSplit[0]))
 
-            #dictMonth[date[1]]
+                #print(date)
+                if date.day in year[date.month]:
+                    year[date.month][date.day].append({'date': date, 'name':splitData[2], 'code':splitData[3]})
+                else:
+                    year[date.month][date.day] = [{'date': date, 'name':splitData[2], 'code':splitData[3]}]
+
+
+        for month in year: 
+            print(getName[month] + ":")
+            for day in year[month]:
+                print("\t" + str(day) + ": " + str(len(year[month][day])) + " events ocurred.")
 
             if curline>maxlines: 
                 break
 
-        print (dictMonth)
+        #print (year)
             
         
      
