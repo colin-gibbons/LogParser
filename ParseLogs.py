@@ -10,9 +10,9 @@ def invert(d): # returns new dictionary of inverted key/value pairs in dictionar
 # Global Vars
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
 fileName = "http.log"
-data = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}} # represents the data of data, key = monthNum, value = dictionary of events on each day
-monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
-intToMonth = invert(monthToInt)
+data = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}} # represents the year of data, key = monthNum, value = dictionary of events on each day
+monthInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
+monthName = invert(monthInt)
 
 # Downloads http log to "http.log"
 def getDataFile(): 
@@ -51,9 +51,9 @@ def parseLog():
             splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
 
             if len(splitData) == 5: # If regex worked:
-                dateSplit = splitData[1].split('/') # splits up day/month/data string
-                date = datetime.date(int(dateSplit[2]), monthToInt[dateSplit[1]], int(dateSplit[0]))
-                logData = {'date': date, 'name':splitData[2], 'code':splitData[3]}
+                dateSplit = splitData[1].split('/') # splits up day/month/year string
+                date = datetime.date(int(dateSplit[2]), monthInt[dateSplit[1]], int(dateSplit[0]))
+                logData = {'date': date, 'name':splitData[2], 'code':splitData[3]} #TODO: Add key for all data
 
                 if date.day in data[date.month]: # if logs list has already been created for that day
                     data[date.month][date.day].append(logData) # append dictionary containing log data
@@ -74,9 +74,10 @@ def main():
         print("Using cached " + fileName + " file.")
         parseLog() # sorts logs by date in data dictionary
 
-        # Main loop
+        # Main loop - goes through data dictionary, keeping track of stats
+        print("Events Per Month/Day/Week:")
         for monthNum, month in data.items(): # for each dictionary in data
-            print(intToMonth[monthNum] + ":")
+            print(monthName[monthNum] + ":") # prints name of month
             for dayNum, logs in month.items(): # for each dictionary in month
                 print("\t" + str(dayNum) + ": " + str(len(logs)) + " events ocurred.")
 
