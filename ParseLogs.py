@@ -84,10 +84,28 @@ def main():
 
         # Main loop - goes through data dictionary, keeping track of stats
         print("Events Per Month/Day/Week:")
+
+        successCode = 0
+        errorCode = 0
+        elsewhereCode = 0
+
         for monthNum, month in data.items(): # for each dictionary in data
             print(monthName[monthNum] + ":") # prints name of month
             for dayNum, logs in month.items(): # for each dictionary in month
                 print("\t" + str(dayNum) + ": " + str(len(logs)) + " events ocurred.")
+                for log in logs:
+                    logCode=int(log['code'])
+                    if logCode<300:
+                        successCode+=1
+                    if 399<logCode:
+                        errorCode+=1
+                    if 299<logCode<400:
+                        elsewhereCode+=1
+        
+        print("Successful requests: " + str(successCode+elsewhereCode))
+        print("Unsuccessful requests: " + str(errorCode))
+        print("Redirected Requests: " + str(elsewhereCode))
+
 
 
 if __name__ == "__main__":
