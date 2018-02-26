@@ -14,7 +14,7 @@ data = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 1
 monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
 intToMonth = invert(monthToInt)
 
-# downloads http log to "http.log"
+# Downloads http log to "http.log"
 def getDataFile(): 
     with open(fileName, 'wb') as logFile: # creates a new http.log file
         with urlopen(url) as stream: # connect to server
@@ -39,15 +39,15 @@ def getDataFile():
             
             print("", end="\n") # reset print appended char
 
-# sorts logs by date in the "data" list.  
+# Sorts logs by date in the "data" dictionary.  
 def parseLog():
     with open(fileName, 'r') as logFile: #opens http.log file
         print("Parsing Data File...")
 
-        curline=0
-        badParses = [] # list of all failed parses TODO: check bad parses or save to file
-        for line in logFile:
-            curline += 1 
+        currline = 0
+        badParses = [] # list of all failed parses
+        for line in logFile: # iterate through entire log file
+            currline += 1 
             splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
 
             if len(splitData) == 5: # If regex worked:
@@ -62,7 +62,7 @@ def parseLog():
             else: # If regex didn't work:
                 badParses.append(splitData) # add to list of failures
 
-        print(str(len(badParses)) + " lines couldn't be parsed.")
+        print(str(len(badParses)) + " lines couldn't be parsed.") #TODO: save bad parses to file
 
             
 
