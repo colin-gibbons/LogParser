@@ -4,6 +4,13 @@ import re
 import datetime
 
 # Helper Funcs
+def genDictionaryList(length): # return new list of empty dictionaries  #TODO make data just a list
+    l = []
+    for x in range(1, length + 1):
+        l.append({})
+    
+    return l
+
 def invert(d): # returns new dictionary of inverted key/value pairs in dictionary d
     return {v: k for k, v in d.items()}
 
@@ -11,7 +18,7 @@ def invert(d): # returns new dictionary of inverted key/value pairs in dictionar
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
 fileName = "http.log"
 data = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}} # represents the year of data, key = monthNum, value = dictionary of events on each day
-monthInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
+monthInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12} # TODO: make 0-11
 monthName = invert(monthInt)
 
 # Downloads http log to "http.log"
@@ -72,6 +79,7 @@ def main():
         getDataFile() # Saves file as http.log
     else:
         print("Using cached " + fileName + " file.")
+       
         parseLog() # sorts logs by date in data dictionary
 
         # Main loop - goes through data dictionary, keeping track of stats
