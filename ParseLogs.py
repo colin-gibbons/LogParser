@@ -3,11 +3,18 @@ import os
 import re
 import datetime
 
+# Helper Funcs
+def invert(d): # returns new dictionary of inverted key/value pairs in dictionary d
+    return {v: k for k, v in d.items()}
+
+# Global Vars
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
 fileName = "http.log"
-year = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}}
+data = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}} # represents the data of data, key = monthNum, value = dictionary of events on each day
 monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
+intToMonth = invert(monthToInt)
 
+# downloads http log to "http.log"
 def getDataFile(): 
     with open(fileName, 'wb') as logFile: # creates a new http.log file
         with urlopen(url) as stream: # connect to server
@@ -18,12 +25,12 @@ def getDataFile():
 
             currentFileSize = 0
             blockSize = 8192
-            while currentFileSize < fileSize: # loop through download (blockSize at a time), and write bytes to file
+            while True: # loop through download (blockSize at a time), and write bytes to file
                 buffer = stream.read(blockSize)
-                if not buffer:
+                if not buffer: # if at end of file
                     break
 
-                currentFileSize += len(buffer)
+                currentFileSize += len(buffer) # track how many bytes downloaded so far
                 logFile.write(buffer)
                 status = r"%10d [%3.2f%%]" % (currentFileSize, currentFileSize*100. / fileSize) # displays percentage downloaded
                 status = status + chr(8)*(len(status) + 1)
@@ -32,27 +39,32 @@ def getDataFile():
             
             print("", end="\n") # reset print appended char
 
-def invert(d):
-    return {v: k for k, v in d.items()}
-
+# sorts logs by date in the "data" list.  
 def parseLog():
     with open(fileName, 'r') as logFile: #opens http.log file
         print("Parsing Data File...")
 
         curline=0
+        badParses = [] # list of all failed parses TODO: check bad parses or save to file
         for line in logFile:
-            curline+=1 
+            curline += 1 
             splitData = re.split('.*\[(.*?):.*\] \".* (.*) .*\" (\d{3})', line)
 
-            if len(splitData) == 5:
-                dateSplit = splitData[1].split('/')
+            if len(splitData) == 5: # If regex worked:
+                dateSplit = splitData[1].split('/') # splits up day/month/data string
                 date = datetime.date(int(dateSplit[2]), monthToInt[dateSplit[1]], int(dateSplit[0]))
-                
-                if date.day in year[date.month]:
-                    year[date.month][date.day].append({'date': date, 'name':splitData[2], 'code':splitData[3]})
-                else:
-                    year[date.month][date.day] = [{'date': date, 'name':splitData[2], 'code':splitData[3]}]
+                logData = {'date': date, 'name':splitData[2], 'code':splitData[3]}
 
+                if date.day in data[date.month]: # if logs list has already been created for that day
+                    data[date.month][date.day].append(logData) # append dictionary containing log data
+                else:
+                    data[date.month][date.day] = [logData] # otherwise add to month dictionary, key = day, value = logData
+            else: # If regex didn't work:
+                badParses.append(splitData) # add to list of failures
+
+        print(str(len(badParses)) + " lines couldn't be parsed.")
+
+            
 
 def main():
     if not os.path.exists(fileName):  # check if file exists before re-downloading
@@ -60,16 +72,14 @@ def main():
         getDataFile() # Saves file as http.log
     else:
         print("Using cached " + fileName + " file.")
-        parseLog() # sorts logs by date in year dictionary
+        parseLog() # sorts logs by date in data dictionary
 
-        for month in year: 
-            print(invert(monthToInt)[month] + ":")
-            for day in year[month]:
-                print("\t" + str(day) + ": " + str(len(year[month][day])) + " events ocurred.")
-        #print (year)
-            
-        
-     
+        # Main loop
+        for monthNum, month in data.items(): # for each dictionary in data
+            print(intToMonth[monthNum] + ":")
+            for dayNum, logs in month.items(): # for each dictionary in month
+                print("\t" + str(dayNum) + ": " + str(len(logs)) + " events ocurred.")
+
 
 if __name__ == "__main__":
     main()
