@@ -5,6 +5,8 @@ import datetime
 
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
 fileName = "http.log"
+year = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}}
+monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
 
 def getDataFile(): 
     with open(fileName, 'wb') as logFile: # creates a new http.log file
@@ -30,22 +32,13 @@ def getDataFile():
             
             print("", end="\n") # reset print appended char
 
+def invert(d):
+    return {v: k for k, v in d.items()}
 
-def main():
-    if not os.path.exists(fileName):  # check if file exists before re-downloading
-        print("No cached " + fileName + " found.\nDownloading from: " + url)
-        getDataFile() # Saves file as http.log
-    else:
-        print("Using cached " + fileName + " file.")
-    
+def parseLog():
     with open(fileName, 'r') as logFile: #opens http.log file
-        print("starting parser")
+        print("Parsing Data File...")
 
-        year = {1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {}, 12:{}}
-        monthToInt = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec':12}
-        getName = {v: k for k, v in monthToInt.items()}
-
-        maxlines=10000000
         curline=0
         for line in logFile:
             curline+=1 
@@ -54,22 +47,25 @@ def main():
             if len(splitData) == 5:
                 dateSplit = splitData[1].split('/')
                 date = datetime.date(int(dateSplit[2]), monthToInt[dateSplit[1]], int(dateSplit[0]))
-
-                #print(date)
+                
                 if date.day in year[date.month]:
                     year[date.month][date.day].append({'date': date, 'name':splitData[2], 'code':splitData[3]})
                 else:
                     year[date.month][date.day] = [{'date': date, 'name':splitData[2], 'code':splitData[3]}]
 
 
+def main():
+    if not os.path.exists(fileName):  # check if file exists before re-downloading
+        print("No cached " + fileName + " found.\nDownloading from: " + url)
+        getDataFile() # Saves file as http.log
+    else:
+        print("Using cached " + fileName + " file.")
+        parseLog() # sorts logs by date in year dictionary
+
         for month in year: 
-            print(getName[month] + ":")
+            print(invert(monthToInt)[month] + ":")
             for day in year[month]:
                 print("\t" + str(day) + ": " + str(len(year[month][day])) + " events ocurred.")
-
-            if curline>maxlines: 
-                break
-
         #print (year)
             
         
