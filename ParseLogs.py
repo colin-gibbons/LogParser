@@ -86,6 +86,7 @@ def main():
     elsewhereCode = 0
 
     fileNames = {} # tracks how many times each file name was referenced
+    weeklyLogs = {}
 
     # Main loop - goes through data dictionary, keeping track of stats
     for monthNum, month in data.items(): # for each dictionary in data
@@ -108,6 +109,13 @@ def main():
                     fileNames[log["name"]] += 1
                 else:
                     fileNames[log["name"]] = 1 
+                
+                # track logs per week
+                if log["date"].isocalendar()[1] in weeklyLogs:
+                    weeklyLogs[log["date"].isocalendar()[1]] += 1
+                else:
+                    weeklyLogs[log["date"].isocalendar()[1]] = 1
+
 
     total_codes = float(successCode + errorCode + elsewhereCode)
     print("\nTotal Requests: " + str(int(total_codes)))
@@ -115,10 +123,10 @@ def main():
     print("Percentage redirected (3xx): {0:.4g} %".format(((elsewhereCode / total_codes) * 100.0)))
 
     sorted_fileNames = sorted(fileNames.items(), key=lambda x: x[1]) # Sort fileNames dict by file count
-
+    sorted_weeklyLogs = sorted(weeklyLogs.items(), key=lambda x: x[0])
     print("\nMost requested file: " + sorted_fileNames[-1][0] + " (accessed " + str(sorted_fileNames[-1][1]) + " times)")
     print("Least requested file: " + sorted_fileNames[0][0] + " (accessed " + str(sorted_fileNames[0][1]) + " time)")
-
+    print("\nRequests per week: " + str(sorted_weeklyLogs))
 
 
 if __name__ == "__main__":
