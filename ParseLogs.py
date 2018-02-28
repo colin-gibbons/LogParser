@@ -60,7 +60,12 @@ def parseLogs(data):
 
         print(str(len(badParses)) + " lines couldn't be parsed.") #TODO: save bad parses to file
 
-            
+def countEvents(month):
+    sum = 0
+    for dayNum, logs in month.items():
+        sum += len(logs)
+    return sum
+ 
 
 def main():
     data = {x:{} for x in range(1,13)}  # generates a dictionary containing 12 empty dictionaries (one for each month of data),
@@ -80,23 +85,39 @@ def main():
     errorCode = 0
     elsewhereCode = 0
 
+    fileNames = {} # tracks how many times each file name was referenced
+
     # Main loop - goes through data dictionary, keeping track of stats
     for monthNum, month in data.items(): # for each dictionary in data
-        print(monthName[monthNum] + ":") # prints name of month
+        print(monthName[monthNum] + ": " +str(countEvents(month)) + " total events") # prints name of month & how many events occurred
         for dayNum, logs in month.items(): # iterate through each day of logs
-            print("\t" + str(dayNum) + ": " + str(len(logs)) + " events ocurred.")
+            print("\t" + str(dayNum) + ": " + str(len(logs)) + " events")
             for log in logs: # iterate through each log dictionary contained in the logs list
+                
+                # track http codes
                 logCode=log['code']
-                if logCode<300:
+                if logCode <= 299:
                     successCode+=1
-                if 399<logCode:
-                    errorCode+=1
-                if 299<logCode<400:
+                elif 300 <= logCode <= 399:
                     elsewhereCode+=1
-    
-    print("Successful requests: " + str(successCode+elsewhereCode))
-    print("Unsuccessful requests: " + str(errorCode))
-    print("Redirected Requests: " + str(elsewhereCode))
+                else: #logCode >= 400
+                    errorCode+=1
+
+                # track file names
+                if log["name"] in fileNames:
+                    fileNames[log["name"]] += 1
+                else:
+                    fileNames[log["name"]] = 1 
+
+    total_codes = float(successCode + errorCode + elsewhereCode)
+    print("\nTotal Requests: " + str(int(total_codes)))
+    print("\nPercentage failure (4xx): {0:.4g} %".format(((errorCode / total_codes) * 100.0)))
+    print("Percentage redirected (3xx): {0:.4g} %".format(((elsewhereCode / total_codes) * 100.0)))
+
+    sorted_fileNames = sorted(fileNames.items(), key=lambda x: x[1]) # Sort fileNames dict by file count
+
+    print("\nMost requested file: " + sorted_fileNames[-1][0] + " (accessed " + str(sorted_fileNames[-1][1]) + " times)")
+    print("Least requested file: " + sorted_fileNames[0][0] + " (accessed " + str(sorted_fileNames[0][1]) + " time)")
 
 
 
