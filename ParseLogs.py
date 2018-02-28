@@ -2,6 +2,7 @@ from urllib.request import urlopen
 import os
 import re
 import datetime
+import json
 
 # Constant Vars
 url = "https://s3.amazonaws.com/tcmg476/http_access_log"
@@ -127,6 +128,12 @@ def main():
     print("\nMost requested file: " + sorted_fileNames[-1][0] + " (accessed " + str(sorted_fileNames[-1][1]) + " times)")
     print("Least requested file: " + sorted_fileNames[0][0] + " (accessed " + str(sorted_fileNames[0][1]) + " time)")
     print("\nRequests per week: " + str(sorted_weeklyLogs))
+
+    print("\nCreating .json files...")
+
+    for monthNum in range(1,13):
+        with open(monthName[monthNum] + ".json", 'w') as outfile:
+            json.dump(data[monthNum], outfile,  default=str)
 
 
 if __name__ == "__main__":
