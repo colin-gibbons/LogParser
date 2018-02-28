@@ -91,9 +91,9 @@ def main():
 
     # Main loop - goes through data dictionary, keeping track of stats
     for monthNum, month in data.items(): # for each dictionary in data
-        print(monthName[monthNum] + ": " +str(countEvents(month)) + " total events") # prints name of month & how many events occurred
+        print("\n" + monthName[monthNum] + ": [" +str(countEvents(month)) + " total events]") # prints name of month & how many events occurred
         for dayNum, logs in month.items(): # iterate through each day of logs
-            print("\t" + str(dayNum) + ": " + str(len(logs)) + " events")
+            print("\t" + str(dayNum) + " - " + str(len(logs)) + " events")
             for log in logs: # iterate through each log dictionary contained in the logs list
                 
                 # track http codes
@@ -117,6 +117,10 @@ def main():
                 else:
                     weeklyLogs[log["date"].isocalendar()[1]] = 1
 
+    sorted_weeklyLogs = sorted(weeklyLogs.items(), key=lambda x: x[0])
+    print("\nRequests per week: ")
+    for weekNum, count in sorted_weeklyLogs:
+        print("\t" + str(weekNum) + " - " + str(count) + " events")
 
     total_codes = float(successCode + errorCode + elsewhereCode)
     print("\nTotal Requests: " + str(int(total_codes)))
@@ -124,10 +128,8 @@ def main():
     print("Percentage redirected (3xx): {0:.4g} %".format(((elsewhereCode / total_codes) * 100.0)))
 
     sorted_fileNames = sorted(fileNames.items(), key=lambda x: x[1]) # Sort fileNames dict by file count
-    sorted_weeklyLogs = sorted(weeklyLogs.items(), key=lambda x: x[0])
     print("\nMost requested file: " + sorted_fileNames[-1][0] + " (accessed " + str(sorted_fileNames[-1][1]) + " times)")
     print("Least requested file: " + sorted_fileNames[0][0] + " (accessed " + str(sorted_fileNames[0][1]) + " time)")
-    print("\nRequests per week: " + str(sorted_weeklyLogs))
 
     print("\nCreating .json files...")
 
